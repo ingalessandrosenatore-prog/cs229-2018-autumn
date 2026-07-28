@@ -45,51 +45,76 @@ class GDA(LinearModel):
             theta: GDA model parameters.
         """
         # *** START CODE HERE ***
-        m = x.shape[0]
-        phi = np.mean(y)
+       m = x.shape[0]
+    phi = np.mean(y)
 
-        conteggio_y_1 = 0
-        conteggio_y_0 = 0
-        somma_x_0 = np.zeros(x.shape[1])
-        somma_x_1 =  np.zeros(x.shape[1])
+    conteggio_y_1 = 0
+    conteggio_y_0 = 0
+    somma_x_0 = np.zeros(x.shape[1])
+    somma_x_1 = np.zeros(x.shape[1])
 
-        for i in range (len(y)):
-            if y[i] == 1:
-                somma_x_1 += x[i]
-                conteggio_y_1 += 1
-            else :
-                 somma_x_0 += x[i]
-                 conteggio_y_0 += 1
+    for i in range(len(y)):
+        if y[i] == 1:
+            somma_x_1 += x[i]
+            conteggio_y_1 += 1
+        else:
+            somma_x_0 += x[i]
+            conteggio_y_0 += 1
 
-       mu_0 = somma_x_0/conteggio_y_0
-       mu_1 = somma_x_1/conteggio_y_1
-       prod = np.zeros(x.shape[1], x.shape[1]))
-       for i range (len(y)):
-          if y[i] == 1:
-           mu_corrente = mu_1
-           else:
-           mu_corrente = mu_0
-        #x.shape (m,n)
-        #x[i] (n,)
-        #mu.shape (n,)  / (x[i] - mu ) (n,)   / (x[i] - mu).T (,n)
-          differenza = (x[i] - mu_corrente).reshape(-1, 1) 
-   '''il rashape cambia forma perche il .T non funziona sui mono dimendionalei
-    es    differenza = x[i] - mu_corrente =  [2, 3] La sua shape è: (2,)
-    Questo è un array monodimensionale. NumPy non lo considera chiaramente né riga né colonna.
-    con differenza.reshape(-1, 1) diventa : [
-    [2],
-    [3]
-]
-la shape quindi dievntra (2,1) cioè un vettore colonna.
-Il -1 significa: calcola automaticamente quante righe servono.
-Il 1 significa: voglio una sola colonna.
-(n,)      array 1D
-(n, 1)    vettore colonna
-(1, n)    vettore riga
-    '''      
-          prod += differenza @ differenza.T  #(n,n)
- 
- 
+    mu_0 = somma_x_0 / conteggio_y_0
+    mu_1 = somma_x_1 / conteggio_y_1
+
+    prod = np.zeros((x.shape[1], x.shape[1]))
+
+    for i in range(len(y)):
+        if y[i] == 1:
+            mu_corrente = mu_1
+        else:
+            mu_corrente = mu_0
+
+        # x[i] e mu_corrente hanno shape (n,).
+        # La loro differenza è quindi ancora un array monodimensionale (n,).
+        # Su un array 1D, .T non cambia la forma.
+        #
+        # reshape(-1, 1) trasforma il vettore:
+        #
+        # [2, 3]          shape (2,)
+        #
+        # in:
+        #
+        # [[2],
+        #  [3]]           shape (2, 1)
+        #
+        # -1 significa che NumPy calcola automaticamente il numero di righe.
+        # 1 significa che vogliamo una sola colonna.
+        #
+        # In questo modo:
+        # differenza.shape   = (n, 1)
+        # differenza.T.shape = (1, n)
+        #
+        # e il prodotto:
+        # (n, 1) @ (1, n)
+        # restituisce una matrice (n, n).
+
+        differenza = (x[i] - mu_corrente).reshape(-1, 1)
+        prod += differenza @ differenza.T
+
+    sigma = prod / m
+
+    sigma_inv = np.linalg.inv(sigma)
+
+    theta = sigma_inv @ (mu_1 - mu_0)
+
+    theta_0 = (
+        0.5
+        * (mu_0 + mu_1).reshape(-1, 1).T
+        @ sigma_inv
+        @ (mu_0 - mu_1).reshape(-1, 1)
+        + np.log(phi / (1 - phi))
+    ).item()
+
+    self.theta = np.concatenate(([theta_0], theta))
+
     
         # *** END CODE HERE ***
 
