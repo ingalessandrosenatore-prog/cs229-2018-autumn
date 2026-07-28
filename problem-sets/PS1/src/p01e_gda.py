@@ -45,8 +45,51 @@ class GDA(LinearModel):
             theta: GDA model parameters.
         """
         # *** START CODE HERE ***
+        m = x.shape[0]
+        phi = np.mean(y)
 
+        conteggio_y_1 = 0
+        conteggio_y_0 = 0
+        somma_x_0 = np.zeros(x.shape[1])
+        somma_x_1 =  np.zeros(x.shape[1])
 
+        for i in range (len(y)):
+            if y[i] == 1:
+                somma_x_1 += x[i]
+                conteggio_y_1 += 1
+            else :
+                 somma_x_0 += x[i]
+                 conteggio_y_0 += 1
+
+       mu_0 = somma_x_0/conteggio_y_0
+       mu_1 = somma_x_1/conteggio_y_1
+       prod = np.zeros(x.shape[1], x.shape[1]))
+       for i range (len(y)):
+          if y[i] == 1:
+           mu_corrente = mu_1
+           else:
+           mu_corrente = mu_0
+        #x.shape (m,n)
+        #x[i] (n,)
+        #mu.shape (n,)  / (x[i] - mu ) (n,)   / (x[i] - mu).T (,n)
+          differenza = (x[i] - mu_corrente).reshape(-1, 1) 
+   '''il rashape cambia forma perche il .T non funziona sui mono dimendionalei
+    es    differenza = x[i] - mu_corrente =  [2, 3] La sua shape è: (2,)
+    Questo è un array monodimensionale. NumPy non lo considera chiaramente né riga né colonna.
+    con differenza.reshape(-1, 1) diventa : [
+    [2],
+    [3]
+]
+la shape quindi dievntra (2,1) cioè un vettore colonna.
+Il -1 significa: calcola automaticamente quante righe servono.
+Il 1 significa: voglio una sola colonna.
+(n,)      array 1D
+(n, 1)    vettore colonna
+(1, n)    vettore riga
+    '''      
+          prod += differenza @ differenza.T  #(n,n)
+ 
+ 
     
         # *** END CODE HERE ***
 
