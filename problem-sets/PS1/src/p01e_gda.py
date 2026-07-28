@@ -13,9 +13,15 @@ def main(train_path, eval_path, pred_path):
         pred_path: Path to save predictions.
     """
     # Load dataset
-    x_train, y_train = util.load_dataset(train_path, add_intercept=False)
+ 
 
     # *** START CODE HERE ***
+     x , y = util.load_dataset(train_path,add_intercept=False)
+    model = GDA()
+    model.fit(x,y)
+
+
+
     # *** END CODE HERE ***
 
 
@@ -39,10 +45,14 @@ class GDA(LinearModel):
             theta: GDA model parameters.
         """
         # *** START CODE HERE ***
+
+
+    
         # *** END CODE HERE ***
 
     def predict(self, x):
-        """Make a prediction given new inputs x.
+        """Make a
+        prediction given new inputs x.
 
         Args:
             x: Inputs of shape (m, n).
