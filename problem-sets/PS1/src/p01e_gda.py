@@ -19,6 +19,9 @@ def main(train_path, eval_path, pred_path):
      x , y = util.load_dataset(train_path,add_intercept=False)
     model = GDA()
     model.fit(x,y)
+    x_equal , y_equal = util.loa_dataset(eval_path,add_intercept = False)
+    model.predict(x_equal , y_equal)
+    
 
 
 
@@ -129,4 +132,11 @@ class GDA(LinearModel):
             Outputs of shape (m,).
         """
         # *** START CODE HERE ***
+        theta_0 = self.theta[0]
+        theta = self.theta[1:]
+        logit = x @  theta + theta_0
+        probabilities = 1/(1+ np.exp(-logit))
+        return predictions = (probabilities > 0).astype(int) 
+  
+         
         # *** END CODE HERE
